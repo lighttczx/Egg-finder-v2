@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Egg Finder V2</title>
+<style>
+body{background:#10131c;color:white;font-family:Arial;padding:20px}
+main{max-width:650px;margin:auto}
+h1{color:#9eacff}
+button{background:#7183ff;color:white;border:0;padding:13px;border-radius:9px;margin:5px}
+input{padding:12px;width:90%;margin:8px 0;background:#20263a;color:white;border:1px solid #444;border-radius:8px}
+.server{background:#20263a;padding:15px;margin:12px 0;border-radius:12px;overflow-wrap:anywhere}
+.small{font-size:12px;color:#aaa}
+</style>
+</head>
+<body>
+<main>
+<h1>🥚 Egg Finder V2</h1>
+<p>Buscador de servidores públicos</p>
+<button id="find">Buscar servidores</button>
+<p id="status">Listo para buscar.</p>
+<div id="servers"></div>
+</main>
+<script>
+const PLACE="107778070777162";
+const API=`https://games.roblox.com/v1/games/${PLACE}/servers/Public?sortOrder=Asc&limit=100`;
+const status=document.getElementById("status");
+const list=document.getElementById("servers");
+
+document.getElementById("find").onclick=async()=>{
+ status.textContent="Buscando...";
+ list.innerHTML="";
+ try{
+  const res=await fetch(API);
+  if(!res.ok)throw Error("HTTP "+res.status);
+  const data=await res.json();
+  const servers=data.data||[];
+  status.textContent="Servidores encontrados: "+servers.length;
+  servers.forEach(s=>{
+   const card=document.createElement("div");
+   card.className="server";
+   const info=document.createElement("p");
+   info.textContent=`Jugadores: ${s.playing}/${s.maxPlayers}`;
+   const id=document.createElement("p");
+   id.className="small";
+   id.textContent="JobId: "+s.id;
+   const btn=document.createElement("button");
+   btn.textContent="ENTRAR";
+   btn.onclick=()=>location.href=`https://www.roblox.com/games/start?placeId=${PLACE}&gameInstanceId=${encodeURIComponent(s.id)}`;
+   card.append(info,id,btn);
+   list.append(card);
+  });
+ }catch(e){
+  status.textContent="Error al buscar: "+e.message+". Puede ser bloqueo CORS.";
+ }
+};
+</script>
+</body>
+</html>
