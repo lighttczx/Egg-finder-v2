@@ -1,26 +1,239 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d19">
 <title>Egg Finder V2</title>
+
 <style>
-body{background:#10131c;color:white;font-family:Arial;padding:20px}
-main{max-width:650px;margin:auto}
-h1{color:#9eacff}
-button{background:#7183ff;color:white;border:0;padding:13px;border-radius:9px;margin:5px}
-.server{background:#20263a;padding:15px;margin:12px 0;border-radius:12px;overflow-wrap:anywhere}
-.small{font-size:12px;color:#aaa}
+:root {
+  color-scheme: dark;
+  --bg:#080d19;
+  --panel:#111a2b;
+  --panel2:#17243a;
+  --text:#f3f6ff;
+  --muted:#91a0ba;
+  --line:#253550;
+  --accent:#a8ff60;
+  --blue:#3988ff;
+}
+
+* { box-sizing:border-box }
+
+body {
+  margin:0;
+  background:radial-gradient(ellipse at top,#14233d 0,#080d19 55%);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+  padding:22px 14px;
+}
+
+body.light {
+  color-scheme:light;
+  --panel:#fff;
+  --panel2:#f1f5fb;
+  --text:#142039;
+  --muted:#61708a;
+  --line:#d7e0ee;
+  --accent:#527c00;
+  --blue:#1768d5;
+  background:linear-gradient(#eaf1fb,#f7f9fc);
+}
+
+main { max-width:760px; margin:auto }
+
+.top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:28px;
+}
+
+.brand {
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.brand span { color:var(--accent) }
+
+button {
+  font:inherit;
+  cursor:pointer;
+  border:0;
+}
+
+.theme,.tab {
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 13px;
+}
+
+.hero { padding:22px 4px 18px }
+
+.eyebrow {
+  color:var(--accent);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:2px;
+}
+
+.hero h1 {
+  font-size:clamp(34px,8vw,54px);
+  line-height:1;
+  margin:10px 0;
+}
+
+.hero p { color:var(--muted) }
+
+.toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:18px 0;
+}
+
+.tab.active {
+  background:var(--accent);
+  color:#10180a;
+  border-color:var(--accent);
+  font-weight:800;
+}
+
+.find {
+  background:var(--blue);
+  color:white;
+  border-radius:12px;
+  padding:12px 18px;
+  font-weight:800;
+  margin-left:auto;
+}
+
+.status {
+  color:var(--muted);
+  font-size:13px;
+  margin:12px 2px 18px;
+}
+
+.grid {
+  display:grid;
+  gap:12px;
+}
+
+.server {
+  background:linear-gradient(145deg,var(--panel2),var(--panel));
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:16px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+}
+
+.label {
+  font-size:10px;
+  letter-spacing:1.5px;
+  color:var(--muted);
+  font-weight:800;
+}
+
+.count {
+  font-size:25px;
+  font-weight:900;
+  margin-top:5px;
+}
+
+.count small {
+  font-size:13px;
+  color:var(--muted);
+  font-weight:600;
+}
+
+.capacity {
+  color:var(--accent);
+  font-size:12px;
+  margin-top:5px;
+}
+
+.join {
+  background:var(--blue);
+  color:#fff;
+  border-radius:11px;
+  padding:12px 17px;
+  font-size:12px;
+  font-weight:900;
+}
+
+.job {
+  grid-column:1/-1;
+  border-top:1px solid var(--line);
+  padding-top:10px;
+  color:var(--muted);
+  font-size:10px;
+  overflow-wrap:anywhere;
+}
+
+.empty {
+  background:var(--panel);
+  border:1px dashed var(--line);
+  padding:25px;
+  border-radius:15px;
+  color:var(--muted);
+  text-align:center;
+}
+
+.foot {
+  color:var(--muted);
+  font-size:11px;
+  text-align:center;
+  margin:24px 0;
+}
+
+@media(min-width:620px) {
+  .grid { grid-template-columns:1fr 1fr }
+}
 </style>
 </head>
+
 <body>
 <main>
-<h1>🥚 Egg Finder V2</h1>
-<p>Buscador de servidores públicos</p>
-<button id="find">Buscar servidores</button>
-<p id="status">Listo para buscar.</p>
-<div id="servers"></div>
+
+<header class="top">
+  <div class="brand">EGG <span>FINDER</span> V2</div>
+  <button class="theme" id="theme">☼ Tema</button>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">ROBLOX · SERVIDORES PÚBLICOS</div>
+  <h1>Encuentra tu<br>servidor.</h1>
+  <p>Explora servidores públicos y entra con un toque.</p>
+</section>
+
+<div class="toolbar">
+  <button class="tab active" data-sort="full">MÁS LLENOS</button>
+  <button class="tab" data-sort="empty">MÁS ESPACIO</button>
+  <button class="tab" data-sort="all">TODOS</button>
+  <button class="find" id="find">BUSCAR ↗</button>
+</div>
+
+<p class="status" id="status">
+  Listo. Pulsa BUSCAR para cargar servidores.
+</p>
+
+<section class="grid" id="servers">
+  <div class="empty">Todavía no hay servidores cargados.</div>
+</section>
+
+<p class="foot">
+  Datos obtenidos de la lista pública de Roblox.
+  La información de huevos aún no está disponible.
+</p>
+
 </main>
 
 <script>
@@ -31,46 +244,98 @@ const API=`https://proxy.cors.dev/https://games.roblox.com/v1/games/${PLACE}/ser
 const status=document.getElementById("status");
 const list=document.getElementById("servers");
 
-document.getElementById("find").onclick=async()=>{
- status.textContent="Buscando...";
- list.innerHTML="";
+let servers=[];
+let sort="full";
 
- try{
-  const res=await fetch(API,{credentials:"omit"});
+function render() {
+  const shown=[...servers].sort((a,b)=>
+    sort==="full" ? b.playing-a.playing :
+    sort==="empty" ?
+    (b.maxPlayers-b.playing)-(a.maxPlayers-a.playing) : 0
+  );
 
-  if(!res.ok)throw Error("HTTP "+res.status);
+  list.innerHTML="";
 
-  const data=await res.json();
-  const servers=data.data||[];
+  if(!shown.length) {
+    list.innerHTML='<div class="empty">No hay resultados. Intenta buscar de nuevo.</div>';
+    return;
+  }
 
-  status.textContent="Servidores encontrados: "+servers.length;
+  shown.forEach(s=>{
+    const card=document.createElement("article");
+    card.className="server";
 
-  servers.forEach(s=>{
-   const card=document.createElement("div");
-   card.className="server";
+    const details=document.createElement("div");
 
-   const info=document.createElement("p");
-   info.textContent=`Jugadores: ${s.playing}/${s.maxPlayers}`;
+    const label=document.createElement("div");
+    label.className="label";
+    label.textContent="JUGADORES EN LÍNEA";
 
-   const id=document.createElement("p");
-   id.className="small";
-   id.textContent="JobId: "+s.id;
+    const count=document.createElement("div");
+    count.className="count";
+    count.textContent=s.playing;
 
-   const btn=document.createElement("button");
-   btn.textContent="ENTRAR";
+    const max=document.createElement("small");
+    max.textContent=" / "+s.maxPlayers;
+    count.append(max);
 
-   btn.onclick=()=>{
-    location.href=`https://www.roblox.com/games/start?placeId=${PLACE}&gameInstanceId=${encodeURIComponent(s.id)}`;
-   };
+    const capacity=document.createElement("div");
+    capacity.className="capacity";
+    capacity.textContent=(s.maxPlayers-s.playing)+" espacios disponibles";
 
-   card.append(info,id,btn);
-   list.append(card);
+    details.append(label,count,capacity);
+
+    const join=document.createElement("button");
+    join.className="join";
+    join.textContent="JOIN ↗";
+
+    join.onclick=()=>{
+      location.href=`https://www.roblox.com/games/start?placeId=${PLACE}&gameInstanceId=${encodeURIComponent(s.id)}`;
+    };
+
+    const job=document.createElement("div");
+    job.className="job";
+    job.textContent="JOB ID · "+s.id;
+
+    card.append(details,join,job);
+    list.append(card);
   });
+}
 
- }catch(e){
-  status.textContent="No se pudo cargar: "+e.message+". Intenta de nuevo más tarde.";
- }
+document.getElementById("find").onclick=async()=>{
+  status.textContent="Conectando con Roblox…";
+  list.innerHTML="";
+
+  try {
+    const res=await fetch(API,{credentials:"omit"});
+
+    if(!res.ok) throw new Error("HTTP "+res.status);
+
+    const data=await res.json();
+    servers=data.data||[];
+
+    status.textContent=servers.length+" servidores encontrados.";
+    render();
+
+  } catch(e) {
+    status.textContent="No se pudo cargar: "+e.message+". Prueba más tarde.";
+    list.innerHTML='<div class="empty">No se pudo obtener la lista de servidores.</div>';
+  }
+};
+
+document.querySelectorAll(".tab").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    sort=btn.dataset.sort;
+    render();
+  });
+});
+
+document.getElementById("theme").onclick=()=>{
+  document.body.classList.toggle("light");
 };
 </script>
+
 </body>
 </html>
